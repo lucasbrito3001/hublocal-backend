@@ -20,7 +20,7 @@ describe('AuthController', () => {
             providers: [AuthService],
         })
         .overrideProvider(AuthService)
-        .useValue({ signIn: jest.fn().mockImplementationOnce(() => Promise.resolve({ hello: 'world' })) })
+        .useValue({ signIn: jest.fn().mockResolvedValueOnce({ hello: 'world' }) })
         .compile();
 
         controller = module.get<AuthController>(AuthController);
@@ -28,11 +28,7 @@ describe('AuthController', () => {
     });
 
     it('should throw BadRequestException when send the request missing infos', async () => {
-        try {
-            await controller.signIn({} as AuthUserDto)
-        } catch (error) {
-            expect(error).toBeInstanceOf(BadRequestException)
-        }
+        expect(controller.signIn({} as AuthUserDto)).rejects.toThrow(BadRequestException)
     });
 
     it('should return the service response to the client', async () => {

@@ -8,6 +8,7 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { MissingRequiredInformationException } from 'src/utils/custom/exceptions.custom';
 
 @ApiTags('users')
 @Controller('users')
@@ -20,12 +21,10 @@ export class UsersController {
     @ApiResponse({ status: 409, description: 'Client send an email that already exists' })
     async create(@Body() createUserDto: CreateUserDto) {
         const { name, email, password } = createUserDto
-        
-        const listedValues = Object.values(createUserDto)
 
-        if(listedValues.some(value => !value)) throw new BadRequestException('Missing infos')
+        if(!name || !email || !password) throw new MissingRequiredInformationException('creating')
 
-        return this.usersService.create({ name, email, password });
+        return await this.usersService.create({ name, email, password });
     }
 }
 

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { BadRequestException } from '@nestjs/common';
+import { MissingRequiredInformationException } from 'src/utils/custom/exceptions.custom';
 
 describe('UsersController', () => {
     const mockUser = {
@@ -20,7 +20,7 @@ describe('UsersController', () => {
             providers: [UsersService],
         })
         .overrideProvider(UsersService)
-        .useValue({ create: jest.fn().mockImplementationOnce(() => Promise.resolve({ hello: 'world' })) })
+        .useValue({ create: jest.fn().mockResolvedValueOnce({ hello: 'world' }) })
         .compile();
 
         controller = module.get<UsersController>(UsersController);
@@ -28,11 +28,7 @@ describe('UsersController', () => {
     });
 
     it("should throw BadRequestException when send the request missing infos", async () => {
-        try {
-            await controller.create({} as CreateUserDto)
-        } catch (error) {
-            expect(error).toBeInstanceOf(BadRequestException)
-        }
+        expect(controller.create({} as CreateUserDto)).rejects.toThrow(MissingRequiredInformationException)
     });
 
     it("should return the service response to the client", async () => {

@@ -22,12 +22,12 @@ describe('AuthService', () => {
         .overrideProvider(UsersService)
         .useValue({
             findOneByEmail: jest.fn()
-                .mockImplementationOnce(() => Promise.resolve(mockUser))
-                .mockImplementationOnce(() => Promise.resolve(null))
-                .mockImplementationOnce(() => Promise.resolve(mockUser))
+                .mockResolvedValueOnce(mockUser)
+                .mockResolvedValueOnce(null)
+                .mockResolvedValueOnce(mockUser)
         })
         .overrideProvider(JwtService)
-        .useValue({ signAsync: jest.fn().mockImplementation(() => Promise.resolve('jwt')) })
+        .useValue({ signAsync: jest.fn().mockResolvedValueOnce('jwt') })
         .compile();
 
         service = module.get<AuthService>(AuthService);
@@ -36,7 +36,7 @@ describe('AuthService', () => {
 
     it('should authenticate an user successfully', async () => {
         const spyFindUserByEmail = jest.spyOn(usersService, 'findOneByEmail')
-        const mockCompare = jest.fn().mockImplementationOnce(() => Promise.resolve(true))
+        const mockCompare = jest.fn().mockResolvedValueOnce(true)
 
         const user = { email: 'mock@mock.com', password: 'mock1234' }
 
@@ -48,19 +48,14 @@ describe('AuthService', () => {
     })
 
     it('should throw unauthorized error when not found an user with the received email', async () => {
-        try {
-            await service.signIn({ email: 'teste@teste.com', password: 'teste123' })
-        } catch (error) {
-            expect(error).toBeInstanceOf(UnauthorizedException)
-        }
+        const sigInPayload = { email: 'teste@teste.com', password: 'teste123' }
+        expect(service.signIn(sigInPayload)).rejects.toThrow(UnauthorizedException)
     })
 
     it('should throw unauthorized error when the password are incorrect', async () => {
-        try {
-            const mockCompare = jest.fn().mockImplementationOnce(() => Promise.resolve(false))
-            await service.signIn({ email: 'teste@teste.com', password: 'teste123' }, mockCompare)
-        } catch (error) {
-            expect(error).toBeInstanceOf(UnauthorizedException)
-        }
+        const mockCompare = jest.fn().mockResolvedValueOnce(false)
+        const sigInPayload = { email: 'teste@teste.com', password: 'teste123' }
+
+        expect(service.signIn(sigInPayload, mockCompare)).rejects.toThrow(UnauthorizedException)
     })
 });
