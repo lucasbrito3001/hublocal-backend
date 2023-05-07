@@ -14,6 +14,6 @@ export class ResponseOk {
 
     constructor(message: string, content?: any[]) {
         this.message = message
-        this.content = content
+        this.content = content || []
     }
 }

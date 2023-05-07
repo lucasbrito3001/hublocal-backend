@@ -33,7 +33,13 @@ export class CompaniesService {
             user: { id: userId } 
         }})
 
-        return new ResponseOk(companies.length > 0 ? 'ok' : "User don't have companies", companies)
+        return new ResponseOk(companies.length > 0 ? 'ok' : "User has no companies", companies)
+    }
+
+    async findOneByUser(id: number, userId: number): Promise<ResponseOk> {
+        const company = await this.companiesRepository.findOneBy({ id,  user: { id: userId } })
+
+        return new ResponseOk(company !== null ? 'ok' : "This company does not exist for this user", [company])
     }
 
     async update(id: number, userId: number, updateCompanyDto: UpdateCompanyDto): Promise<ResponseOk> {
@@ -43,13 +49,9 @@ export class CompaniesService {
         if(!isValidCnpj) throw new InvalidCnpjException()
 
         const company = await this.companiesRepository.findOneBy({ cnpj })
-
-        console.log(company)
-
         if(company !== null && company.id !== id) throw new DuplicatedUniqueKeyException('company', 'cnpj')
 
         const { affected } = await this.companiesRepository.update({ id, user: { id: userId } }, { name, website, cnpj })
-
         if(affected === 0) throw new EntityNotFoundException('company', 'update')
 
         return new ResponseOk('Company updated succesfully')

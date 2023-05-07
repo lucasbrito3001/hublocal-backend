@@ -1,36 +1,57 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes, Query, ParseIntPipe, ValidationPipe } from '@nestjs/common';
 import { LocationsService } from './locations.service';
-import { CreateLocationDto } from './dto/create-location.dto';
-import { UpdateLocationDto } from './dto/update-location.dto';
+import { CreateLocationDto, createLocationSchema } from './dto/create-location.dto';
+import { UpdateLocationDto, updateLocationSchema } from './dto/update-location.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
+import { JwtPayloadAuthGuard } from 'src/utils/custom/decorators.custom';
+import { JoiValidationPipe } from 'src/utils/custom/pipes.custom';
+import { ResponseCreated } from 'src/utils/types/responseOk.type';
+import { FindAllParams } from './locations.controller.params';
 
 @ApiTags('locations')
+@UseGuards(AuthGuard)
 @Controller('locations')
 export class LocationsController {
-  constructor(private readonly locationsService: LocationsService) {}
+    constructor(private readonly locationsService: LocationsService) { }
 
-  @Post()
-  create(@Body() createLocationDto: CreateLocationDto) {
-    return this.locationsService.create(createLocationDto);
-  }
+    @Post()
+    async create(
+        @Body(new JoiValidationPipe(createLocationSchema)) createLocationDto: CreateLocationDto,
+        @JwtPayloadAuthGuard() jwtPayload: any
+    ): Promise<ResponseCreated> {
+        const { userId } = jwtPayload
+        return this.locationsService.create(createLocationDto, userId);
+    }
 
-  @Get()
-  findAll() {
-    return this.locationsService.findAll();
-  }
+    @Get()
+    async findAllByCompany(
+        @Query(new ValidationPipe({
+            transform: true
+        })) queryParams: FindAllParams,
+        @JwtPayloadAuthGuard() jwtPayload: any
+    ) {
+        const { companyId } = queryParams;
+        const { userId } = jwtPayload
+        return this.locationsService.findAllByCompany(userId, +companyId);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.locationsService.findOne(+id);
-  }
+    @Patch(':id')
+    async update(
+        @Param('id') id: string,
+        @Body(new JoiValidationPipe(updateLocationSchema)) updateLocationDto: UpdateLocationDto,
+        @JwtPayloadAuthGuard() jwtPayload: any
+    ) {
+        const { userId } = jwtPayload
+        return this.locationsService.update(+id, updateLocationDto, userId);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLocationDto: UpdateLocationDto) {
-    return this.locationsService.update(+id, updateLocationDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.locationsService.remove(+id);
-  }
+    @Delete(':id')
+    async remove(
+        @Param('id') id: string,
+        @JwtPayloadAuthGuard() jwtPayload: any
+    ) {
+        const { userId } = jwtPayload;
+        return this.locationsService.remove(+id, userId);
+    }
 }

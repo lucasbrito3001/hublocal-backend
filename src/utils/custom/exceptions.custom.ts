@@ -6,6 +6,12 @@ export class InvalidCnpjException extends BadRequestException {
     }
 }
 
+export class SchemaValidationFailedException extends BadRequestException {
+    constructor() {
+        super('The request body data contains missing or invalid data, check and try again')
+    }
+}
+
 export class DuplicatedUniqueKeyException extends ConflictException {
     constructor(entity: string, uniqueKey: string) {
         super(`Already exists a ${entity} with this ${uniqueKey}`)

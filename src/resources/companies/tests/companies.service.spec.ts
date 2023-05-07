@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { CompaniesService } from './companies.service'
+import { CompaniesService } from '../companies.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { Company } from './entities/company.entity'
+import { Company } from '../entities/company.entity'
 import { DuplicatedUniqueKeyException, EntityNotFoundException, InvalidCnpjException, MissingRequiredInformationException } from 'src/utils/custom/exceptions.custom'
 import { ResponseOk } from 'src/utils/types/responseOk.type'
 
 describe('CompaniesService', () => {
-    const validCNPJ = '75177950000195'
+    const validCNPJ = '75.177.950/0001-95'
     const invalidCnpj = '00000000000000'
 
     const mockCompanyValidCnpj = {
@@ -111,7 +111,7 @@ describe('CompaniesService', () => {
         }
     )
 
-    it('should call the method find of the repository whith the value passed from service',
+    it('should call the method find of the repository with the value passed from service',
         async () => {
             const userId = 10
             const company = new Company('mock', 'mock.com', '00000000000000')
@@ -123,6 +123,10 @@ describe('CompaniesService', () => {
         }
     )
 
+    it('should read the company succesfully', async () => {
+        
+    })
+
     it('should update a company successfully when te cnpj received not exists in the database',
         async () => {
             findOneBy.mockResolvedValueOnce(null)
@@ -130,7 +134,7 @@ describe('CompaniesService', () => {
 
             const updateRes = await service.update(1, jwtPayload.userId, mockCompanyValidCnpj)
             
-            expect(updateRes).toEqual({ statusCode: 200, message: 'Company updated succesfully' })
+            expect(updateRes).toEqual({ statusCode: 200, message: 'Company updated succesfully', content: [] })
         }
     )
 
@@ -141,7 +145,7 @@ describe('CompaniesService', () => {
 
             const updateRes = await service.update(1, jwtPayload.userId, mockCompanyValidCnpj)
             
-            expect(updateRes).toEqual({ statusCode: 200, message: 'Company updated succesfully' })
+            expect(updateRes).toEqual({ statusCode: 200, message: 'Company updated succesfully', content: [] })
         }
     )
 
@@ -200,7 +204,7 @@ describe('CompaniesService', () => {
         }
     )
 
-    it('shoudl call the repository method with userId and idCompany',
+    it('should call the repository method with userId and idCompany',
         async () => {
             deleteFn.mockResolvedValueOnce({ affected: 1 })
 
