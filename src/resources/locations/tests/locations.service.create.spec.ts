@@ -6,6 +6,7 @@ import { CompaniesService } from '../../companies/companies.service';
 import { ResponseCreated, ResponseOk } from 'src/utils/types/responseOk.type';
 import { CreateLocationDto } from '../dto/create-location.dto';
 import { ForbiddenException } from '@nestjs/common';
+import { UtilsService } from 'src/resources/utils/utils.service';
 
 describe('LocationsService - Create', () => {
     const jwtPayload: any = { "userId": 1, "userEmail": "mock@mock.com", "iat": 1683206041 }
@@ -23,12 +24,14 @@ describe('LocationsService - Create', () => {
 
     let save: any
     let findOneCompanyByUser: any
+    let clearNumberString: any
 
     let service: LocationsService;
 
     beforeEach(async () => {
         save = jest.fn()
         findOneCompanyByUser = jest.fn()
+        clearNumberString = jest.fn()
 
         mockRepository = { save }
 
@@ -36,6 +39,7 @@ describe('LocationsService - Create', () => {
             providers: [
                 LocationsService,
                 CompaniesService,
+                UtilsService,
                 {
                     provide: getRepositoryToken(Location),
                     useValue: mockRepository
@@ -43,6 +47,7 @@ describe('LocationsService - Create', () => {
             ],
         })
         .overrideProvider(CompaniesService).useValue({ findOneByUser: findOneCompanyByUser })
+        .overrideProvider(UtilsService).useValue({ clearNumberString })
         .compile();
 
         service = module.get<LocationsService>(LocationsService);
@@ -51,6 +56,7 @@ describe('LocationsService - Create', () => {
     it('should create a location successfully', async () => {
         mockRepository.save.mockResolvedValueOnce()
         findOneCompanyByUser.mockResolvedValueOnce(new ResponseOk('ok', [{ id: 1 }]))
+        clearNumberString.mockReturnValueOnce('123')
 
         const resultCreate = await service.create(mockLocation, jwtPayload.userId)
 
@@ -58,13 +64,15 @@ describe('LocationsService - Create', () => {
     });
 
     it('should call the findOneByUser method and the save method when create succesfully', async () => {
+        const formattedZipCode = '123321'
         mockRepository.save.mockResolvedValueOnce()
         findOneCompanyByUser.mockResolvedValueOnce(new ResponseOk('ok', [{ id: 1 }]))
+        clearNumberString.mockReturnValueOnce(formattedZipCode)
         const { companyId, ...locationInfos } = mockLocation
 
         await service.create(mockLocation, jwtPayload.userId)
 
-        expect(mockRepository.save).toBeCalledWith({ ...locationInfos, company: { id: companyId } })
+        expect(mockRepository.save).toBeCalledWith({ ...{ ...locationInfos, zipCode: formattedZipCode }, company: { id: companyId } })
         expect(findOneCompanyByUser).toBeCalledWith(companyId, jwtPayload.userId)
     })
 

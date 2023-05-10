@@ -8,6 +8,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { MockRepository } from 'src/utils/test/repository.mock';
 import { UpdateLocationDto } from '../dto/update-location.dto';
 import { EntityNotFoundException } from 'src/utils/custom/exceptions.custom';
+import { UtilsService } from 'src/resources/utils/utils.service';
 
 describe('LocationsService', () => {
     let mockRepository: any
@@ -34,6 +35,7 @@ describe('LocationsService', () => {
             providers: [
                 LocationsService,
                 CompaniesService,
+                UtilsService,
                 {
                     provide: getRepositoryToken(Location),
                     useValue: mockRepository

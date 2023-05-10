@@ -29,3 +29,9 @@ export class EntityNotFoundException extends BadRequestException {
         super(`Could not ${action} because the ${entity} was not found`)
     }
 }
+
+export class ImposibleDeleteByRelationException extends ConflictException {
+    constructor() {
+        super("This item can't be deleted because it still has active relationships")
+    }
+}

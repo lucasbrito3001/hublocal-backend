@@ -1,6 +1,6 @@
 import { Location } from "src/resources/locations/entities/location.entity";
 import { User } from "src/resources/users/entities/user.entity";
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Company {

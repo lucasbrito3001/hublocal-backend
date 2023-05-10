@@ -35,8 +35,9 @@ describe('AuthService', () => {
     });
 
     it('should authenticate an user successfully', async () => {
+        const { passwordHash, ...userWithoutPassword }= mockUser
         const spyFindUserByEmail = jest.spyOn(usersService, 'findOneByEmail')
-        const mockCompare = jest.fn().mockResolvedValueOnce(true)
+        const mockCompare = jest.fn().mockResolvedValueOnce(mockUser)
 
         const user = { email: 'mock@mock.com', password: 'mock1234' }
 
@@ -44,7 +45,7 @@ describe('AuthService', () => {
 
         expect(spyFindUserByEmail).toHaveBeenCalledWith(user.email)
         expect(mockCompare).toHaveBeenCalledWith('mock1234', 'mockPasswordHash')
-        expect(res).toStrictEqual({ statusCode: 200, token: 'jwt' })
+        expect(res).toStrictEqual({ statusCode: 200, token: 'jwt', user: userWithoutPassword })
     })
 
     it('should throw unauthorized error when not found an user with the received email', async () => {

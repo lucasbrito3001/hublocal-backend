@@ -7,6 +7,8 @@ import { JwtService } from '@nestjs/jwt'
 import { MissingRequiredInformationException } from 'src/utils/custom/exceptions.custom'
 import { CreateCompanyDto } from '../dto/create-company.dto'
 import { UpdateCompanyDto } from '../dto/update-company.dto'
+import { UtilsService } from 'src/resources/utils/utils.service'
+import { ForbiddenException } from '@nestjs/common'
 
 describe('CompaniesController', () => {
     const helloWorldExample = { hello: 'world' }
@@ -24,12 +26,14 @@ describe('CompaniesController', () => {
     let controller: CompaniesController
 
     let findAllByUser:any
+    let findOneByUser: any
     let create: any
     let update: any
     let remove: any
 
     beforeEach(async () => {
         findAllByUser = jest.fn()
+        findOneByUser = jest.fn()
         create = jest.fn()
         update = jest.fn()
         remove = jest.fn()
@@ -46,7 +50,7 @@ describe('CompaniesController', () => {
             ]
         })
         .overrideProvider(CompaniesService)
-        .useValue({ findAllByUser, create, update, remove })
+        .useValue({ findAllByUser, findOneByUser, create, update, remove })
         .compile()
 
         controller = module.get<CompaniesController>(CompaniesController)
@@ -81,19 +85,37 @@ describe('CompaniesController', () => {
         expect(controller.update('1', jwtPayload, updateCompanyDto)).rejects.toThrow(MissingRequiredInformationException)
     })
 
-    it('should return the response received by the method findAllByUser of the service', async () => {
-        findAllByUser.mockResolvedValueOnce(helloWorldExample)
+    it('should return the response received by findAllByUser but removing the property locations and adding quantityLocations', async () => {
+        findAllByUser.mockResolvedValueOnce({ 
+            content: [{
+                locations: [1, 2, 3]
+            }]
+        })
 
-        const responseFindAll = await controller.findAllByUser(jwtPayload)
+        const responseFindAll = await controller.findAllByUser(jwtPayload, { page: 0, rowsPerPage: 10 })
 
-        expect(responseFindAll).toEqual(helloWorldExample)
+        expect(responseFindAll).toEqual({ content: [{ quantityLocations: 3 }] })
     })
 
     it('should return the response received by the method remove of the service', async () => {
         remove.mockResolvedValueOnce(helloWorldExample)
 
-        const responseUpdate = await controller.remove('1', jwtPayload)
+        const responseRemove = await controller.remove('1', jwtPayload)
 
-        expect(responseUpdate).toEqual(helloWorldExample)
+        expect(responseRemove).toEqual(helloWorldExample)
+    })
+
+    it('should return the response received by the method findById of the service', async () => {
+        findOneByUser.mockResolvedValueOnce(helloWorldExample)
+
+        const responseFindById = await controller.findById('1', jwtPayload)
+
+        expect(responseFindById).toEqual(helloWorldExample)
+    })
+
+    it('should return the response received by the method findById of the service', async () => {
+        await controller.findById('1', jwtPayload)
+
+        expect(findOneByUser).toHaveBeenCalledWith(1, jwtPayload.userId)
     })
 })

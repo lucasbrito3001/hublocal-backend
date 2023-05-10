@@ -4,14 +4,17 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from './entities/company.entity';
 import { Repository } from 'typeorm';
-import { cnpj, cnpj as cnpjValidator } from 'cpf-cnpj-validator';
-import { DuplicatedUniqueKeyException, EntityNotFoundException, InvalidCnpjException } from 'src/utils/custom/exceptions.custom';
+import { cnpj as cnpjValidator } from 'cpf-cnpj-validator';
+import { DuplicatedUniqueKeyException, EntityNotFoundException, ImposibleDeleteByRelationException, InvalidCnpjException } from 'src/utils/custom/exceptions.custom';
 import { ResponseCreated, ResponseOk } from 'src/utils/types/responseOk.type';
+import { UtilsService } from '../utils/utils.service';
+import { LocationsService } from '../locations/locations.service';
 
 @Injectable()
 export class CompaniesService {
     constructor(
-        @InjectRepository(Company) private companiesRepository: Repository<Company>
+        @InjectRepository(Company) private companiesRepository: Repository<Company>,
+        private utilsService: UtilsService
     ) { }
 
     async create(createCompanyDto: CreateCompanyDto, userId: number): Promise<ResponseCreated> {
@@ -23,17 +26,30 @@ export class CompaniesService {
         const company = await this.companiesRepository.findOneBy({ cnpj })
         if(company !== null) throw new DuplicatedUniqueKeyException('company', 'cnpj')
 
-        await this.companiesRepository.save({ name, website, cnpj, user: { id: userId } })
+        const formattedCnpj = this.utilsService.clearNumberString(cnpj)
+
+        await this.companiesRepository.save({ name, website, cnpj: formattedCnpj, user: { id: userId } })
 
         return new ResponseCreated('Company created successfully')
     }
 
-    async findAllByUser(userId: number): Promise<ResponseOk> {
-        const companies = await this.companiesRepository.find({ where: { 
-            user: { id: userId } 
-        }})
+    async findAllByUser(userId: number, page: number, rowsPerPage: number): Promise<ResponseOk> {
+        const [companies, total] = await this.companiesRepository.findAndCount({ 
+            where: { 
+                user: { id: userId } 
+            },
+            order: { id: 'asc' },
+            relations: ['locations'],
+            loadRelationIds: true,
+            skip: page * rowsPerPage,
+            take: rowsPerPage
+        })
 
-        return new ResponseOk(companies.length > 0 ? 'ok' : "User has no companies", companies)
+        return new ResponseOk(
+            companies.length > 0 ? 'ok' : "User has no companies", 
+            companies, 
+            { totalCompanies: total }
+        )
     }
 
     async findOneByUser(id: number, userId: number): Promise<ResponseOk> {
@@ -51,13 +67,26 @@ export class CompaniesService {
         const company = await this.companiesRepository.findOneBy({ cnpj })
         if(company !== null && company.id !== id) throw new DuplicatedUniqueKeyException('company', 'cnpj')
 
-        const { affected } = await this.companiesRepository.update({ id, user: { id: userId } }, { name, website, cnpj })
+        const formattedCnpj = this.utilsService.clearNumberString(cnpj)
+
+        const { affected } = await this.companiesRepository.update(
+            { id, user: { id: userId } },
+            { name, website, cnpj: formattedCnpj }
+        )
         if(affected === 0) throw new EntityNotFoundException('company', 'update')
 
         return new ResponseOk('Company updated succesfully')
     }
 
     async remove(id: number, userId: number): Promise<any> {
+        const companyLocations = await this.companiesRepository.findOne({
+            where: { id },
+            relations: ['locations'],
+            loadRelationIds: true
+        })
+
+        if(companyLocations?.locations.length > 0) throw new ImposibleDeleteByRelationException()
+
         const { affected } = await this.companiesRepository.delete({ id, user: { id: userId } })
 
         if(affected === 0) throw new EntityNotFoundException('company', 'delete')

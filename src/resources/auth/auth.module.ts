@@ -13,7 +13,7 @@ import { configService } from 'src/utils/config/config.service';
         JwtModule.register({
             global: true,
             secret: configService.getJwtSecret(),
-            signOptions: { expiresIn: '5m' }
+            signOptions: { expiresIn: '1h' }
         })
     ]
 })

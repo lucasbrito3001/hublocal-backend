@@ -11,7 +11,7 @@ import { UpdateLocationDto } from '../dto/update-location.dto'
 describe('LocationsController', () => {
     const helloWorldExample = { hello: 'world' }
     const jwtPayload = { "userId": 1, "userEmail": "mock@mock.com", "iat": 1683206041 }
-    const queryParams = { companyId: 1 }
+    const queryParams = { companyId: 1, page: 0, rowsPerPage: 10 }
     const createLocationDto: CreateLocationDto = {
         name: 'mock',
         city: 'mock city',

@@ -1,9 +1,16 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsNumberString, IsOptional } from "class-validator";
 
 export class FindAllParams {
-    @ApiPropertyOptional()
-    @IsOptional()
+    @ApiProperty()
     @IsNumberString()
-    companyId?: number
+    companyId: number
+
+    @ApiProperty()
+    @IsNumberString()
+    page: number
+
+    @ApiProperty()
+    @IsNumberString()
+    rowsPerPage: number
 }

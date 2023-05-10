@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes,
 import { LocationsService } from './locations.service';
 import { CreateLocationDto, createLocationSchema } from './dto/create-location.dto';
 import { UpdateLocationDto, updateLocationSchema } from './dto/update-location.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { JwtPayloadAuthGuard } from 'src/utils/custom/decorators.custom';
 import { JoiValidationPipe } from 'src/utils/custom/pipes.custom';
@@ -16,6 +16,9 @@ export class LocationsController {
     constructor(private readonly locationsService: LocationsService) { }
 
     @Post()
+    @ApiResponse({ status: 201, description: 'Created successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid or missing info in request body' })
+    @ApiResponse({ status: 403, description: 'The user does not have permission to create location for this company' })
     async create(
         @Body(new JoiValidationPipe(createLocationSchema)) createLocationDto: CreateLocationDto,
         @JwtPayloadAuthGuard() jwtPayload: any
@@ -25,18 +28,24 @@ export class LocationsController {
     }
 
     @Get()
+    @ApiResponse({ status: 200, description: 'Read successfully' })
+    @ApiResponse({ status: 400, description: 'Invalid or missing query parameter companyId' })
+    @ApiResponse({ status: 403, description: 'The user does not have permission to read infos for this company' })
     async findAllByCompany(
         @Query(new ValidationPipe({
             transform: true
         })) queryParams: FindAllParams,
         @JwtPayloadAuthGuard() jwtPayload: any
     ) {
-        const { companyId } = queryParams;
+        const { companyId, page, rowsPerPage } = queryParams;
         const { userId } = jwtPayload
-        return this.locationsService.findAllByCompany(userId, +companyId);
+        return this.locationsService.findAllByCompany(+companyId, userId, page, rowsPerPage);
     }
 
     @Patch(':id')
+    @ApiResponse({ status: 200, description: 'Updated successfully' })
+    @ApiResponse({ status: 400, description: 'Update failed because the location does not exists' })
+    @ApiResponse({ status: 403, description: 'The user does not have permission to update location for this company' })
     async update(
         @Param('id') id: string,
         @Body(new JoiValidationPipe(updateLocationSchema)) updateLocationDto: UpdateLocationDto,
@@ -47,6 +56,9 @@ export class LocationsController {
     }
 
     @Delete(':id')
+    @ApiResponse({ status: 201, description: 'Deleted successfully' })
+    @ApiResponse({ status: 400, description: 'Delete failed because the location does not exists' })
+    @ApiResponse({ status: 403, description: 'The user does not have permission to delete location for this company' })
     async remove(
         @Param('id') id: string,
         @JwtPayloadAuthGuard() jwtPayload: any

@@ -5,6 +5,7 @@ import { configService } from './utils/config/config.service';
 import { AuthModule } from './resources/auth/auth.module';
 import { LocationsModule } from './resources/locations/locations.module';
 import { CompaniesModule } from './resources/companies/companies.module';
+import { UtilsService } from './resources/utils/utils.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { CompaniesModule } from './resources/companies/companies.module';
     CompaniesModule
   ],
   controllers: [],
-  providers: [],
+  providers: [UtilsService],
 })
 export class AppModule {}

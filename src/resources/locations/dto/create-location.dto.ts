@@ -29,7 +29,7 @@ export class CreateLocationDto {
 
 export const createLocationSchema = Joi.object({
     name: Joi.string().required(),
-    zipCode: Joi.string().required().regex(/^\d{8}$/),
+    zipCode: Joi.string().required().regex(/^\d{5}-?\d{3}$/),
     street: Joi.string().required(),
     number: Joi.number().required(),
     district: Joi.string().required(),
