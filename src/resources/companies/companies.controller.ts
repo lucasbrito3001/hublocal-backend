@@ -5,10 +5,11 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { AuthGuard } from 'src/resources/auth/auth.guard';
 import { JwtPayloadAuthGuard } from 'src/utils/custom/decorators.custom';
 import { MissingRequiredInformationException } from 'src/utils/custom/exceptions.custom';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllParams } from './companies.controller.params';
 
 @ApiTags('companies')
+@ApiBearerAuth()
 @UseGuards(AuthGuard)
 @Controller('companies')
 export class CompaniesController {

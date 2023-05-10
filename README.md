@@ -1,74 +1,49 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# **Controle de instalações de empresas - HubLocal**
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A ideia inicial do projeto é oferecer para o usuário a possibilidade de controlar, de forma simples, os locais onde suas empresas estão, e, posteriormente, usá-los para inserir suas marcas nos principais mapas e listas da internet. Neste reposítório você encontra a API utilizada pela aplicação, que registra os usuários e suas empresas e locais.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## **Lista de linguagens, tecnologias e frameworks utilizados**
+- Nest JS
+- TypeORM
+- Postgres
+- bcrypt
+- joi
+- swagger
 
-## Description
+## **Instalação e uso do projeto**
+O setup pode ser feito de 2 formas, instalando as dependências e levantando a aplicação manualmente ou utilizando o Docker, fica a critério do usuário.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Porém, independente da forma escolhida, será necessário a criação de um arquivo ***.env*** com as variáveis de ambiente e ele deve seguir o template do arquivo ***.env.template*** que se encontra na raíz do projeto. Feito isso podemos iniciar a instalação do projeto.
 
-## Installation
+### **Setup manual**
+Primeiro será necessário que você tenha acesso ao postgres na sua máquina para fazer a conexão com o TypeORM, você pode instalar o banco na sua máquina ou levantar um container docker com a imagem dele, o que achar melhor.
+
+Depois, será necessário instalar as dependências do projeto, abra um terminal e vá até o diretório raíz do repositório, onde está o arquivo package.json e rode um dos comandos abaixo
 
 ```bash
-$ yarn install
+npm install
+yarn
 ```
-
-## Running the app
+E pronto, já ta tudo pronto para levantar o projeto, basta iniciar o servidor em modo desenvolvimento usando um dos comandos abaixo
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+npm run start:dev
+yarn start:dev
 ```
 
-## Test
+### **Setup docker**
+Para isso, irei considerar que você já tem o ***Docker*** e o ***docker-compose*** instalado e configurado na sua máquina. Sendo assim, é simples, vá até o diretório raiz do projeto e rode o comando
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
+E pronto, o projeto já vai estar rodando e fazendo o live-reload ao alterar os arquivos.
 
-## Support
+## **Documentação da API**
+Após ter iniciado a aplicação, você pode ver a documentação da API feita com o ***nextjs/swagger*** no link:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+`http://localhost:{API_PORT}/api`
 
-## Stay in touch
+Nela você irá encontrar todos os endpoints que existem na API com marcação de quais são protegidos via token, suas possíveis respostas, parâmetros esperados e schemas das entidades.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
-# hublocal-backend
+> <div style="padding: 8px 0">This is a challenge by <a href="https://coodesh.com/" target="_blank">Coodesh</a></div>

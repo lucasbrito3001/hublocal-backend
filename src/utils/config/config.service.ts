@@ -24,17 +24,10 @@ class ConfigService {
         return this.getValue('PORT');
     }
 
-    public isProduction() {
-        return this.getValue('MODE', false) != 'DEV';
-    }
-
     public getTypeOrmConfig(): TypeOrmModuleOptions {
         return {
             type: 'postgres',
             entities: [join(__dirname, '..', '..', 'resources', '**', '*.entity{.ts,.js}')],
-            // // migrationsTableName: 'migration',
-            // // migrations: ['src/migration/*.ts'],
-            ssl: this.isProduction(),
             synchronize: true,
             url: this.getValue('DB_URL_CONNECTION')
         };
@@ -48,6 +41,7 @@ class ConfigService {
 
 const configService = new ConfigService(process.env)
     .ensureValues([
+        'PORT',
         'DB_URL_CONNECTION',
         'JWT_SECRET'
     ]);

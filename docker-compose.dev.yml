@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+    api:
+        depends_on:
+            - pgsql
+        build:
+            dockerfile: Dockerfile
+            context: .
+            target: development
+        env_file:
+            - .env
+        volumes:
+            - .:/usr/src/app
+            - /usr/src/app/node_modules
+        command: npm run start:dev
+        ports:
+            - 3000:${PORT}
+        networks:
+            - app-network
+        restart: always

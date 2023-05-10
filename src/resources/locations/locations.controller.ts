@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UsePipes,
 import { LocationsService } from './locations.service';
 import { CreateLocationDto, createLocationSchema } from './dto/create-location.dto';
 import { UpdateLocationDto, updateLocationSchema } from './dto/update-location.dto';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { JwtPayloadAuthGuard } from 'src/utils/custom/decorators.custom';
 import { JoiValidationPipe } from 'src/utils/custom/pipes.custom';
@@ -11,6 +11,7 @@ import { FindAllParams } from './locations.controller.params';
 
 @ApiTags('locations')
 @UseGuards(AuthGuard)
+@ApiBearerAuth()
 @Controller('locations')
 export class LocationsController {
     constructor(private readonly locationsService: LocationsService) { }
