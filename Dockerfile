@@ -1,40 +1,30 @@
-###################
-# BUILD FOR PRODUCTION
-###################
-
-FROM node:18-alpine As build
+# build stage            
+FROM node:18-alpine AS build
 
 WORKDIR /usr/src/app
 
-COPY --chown=node:node package*.json ./
-COPY --chown=node:node tsconfig.json ./
+COPY package*.json .
 
-RUN npm ci
+RUN npm install
 
-# Run the build command which creates the production bundle
+COPY . .
+
 RUN npm run build
 
-# Set NODE_ENV environment variable
-ENV NODE_ENV production
-
-# Running `npm ci` removes the existing node_modules directory.
-# Passing in --only=production ensures that only the production dependencies are installed.
-# This ensures that the node_modules directory is as optimized as possible.
-RUN npm ci --only=production && npm cache clean --force
-
-USER node
-
-###################
-# PRODUCTION
-###################
-
-FROM node:18-alpine As production
-
+# prod stage
+FROM node:18-alpine AS production
 WORKDIR /usr/src/app
 
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+COPY package*.json ./
+RUN npm install --only=production
+
+# copy the builded code
+COPY --chown=node:node --from=build /usr/src/app/dist/. ./dist
+
+EXPOSE 3000
 
 # Start the server using the production build
-# CMD [ "node", "dist/main.js" ]
+CMD [ "node", "dist/main.js" ]

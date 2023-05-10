@@ -11,7 +11,7 @@ services:
             - .env
         volumes:
             - .:/usr/src/app
-        command: node usr/src/app/dist/main.js
+        command: node dist/main.js
         ports:
             - 3000:3000
         networks:
