@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+    api:
+        depends_on:
+            - pgsql
+        build:
+            dockerfile: Dockerfile
+            context: .
+        env_file:
+            - .env
+        volumes:
+            - .:/usr/src/app
+        command: node usr/src/app/dist/main.js
+        ports:
+            - 3000:3000
+        networks:
+            - app-network
+
+    pgsql:
+        image: postgres:alpine
+        restart: always
+        ports:
+            - '5555:5432'
+        container_name: 'pgsql'
+        env_file:
+            - .env
+        volumes:
+            - postgres-persistence:/var/lib/postgresql/data
+        networks:
+            - app-network
+
+volumes:
+    postgres-persistence:
+        name: postgres-datas
+
+networks:
+    app-network:
+        driver: bridge

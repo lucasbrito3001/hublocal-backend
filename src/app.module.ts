@@ -1,16 +1,21 @@
 import { Module } from '@nestjs/common';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './resources/users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { configService } from './config/config.service';
-import { AuthModule } from './auth/auth.module';
+import { configService } from './utils/config/config.service';
+import { AuthModule } from './resources/auth/auth.module';
+import { LocationsModule } from './resources/locations/locations.module';
+import { CompaniesModule } from './resources/companies/companies.module';
+import { UtilsService } from './resources/utils/utils.service';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(configService.getTypeOrmConfig()),
     UsersModule,
-    AuthModule
+    AuthModule,
+    LocationsModule,
+    CompaniesModule
   ],
   controllers: [],
-  providers: [],
+  providers: [UtilsService],
 })
 export class AppModule {}
