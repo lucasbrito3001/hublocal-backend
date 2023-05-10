@@ -47,6 +47,7 @@ Após ter iniciado a aplicação, você pode ver a documentação da API feita c
 Nela você irá encontrar todos os endpoints que existem na API com marcação de quais são protegidos via token, suas possíveis respostas, parâmetros esperados e schemas das entidades.
 
 Link da API: http://ec2-15-229-47-195.sa-east-1.compute.amazonaws.com:3000/
+
 Link da apresentação: https://www.loom.com/embed/ccdd53539cde4e5b980d31c646ac099d
 
 > <div style="padding: 8px 0">This is a challenge by <a href="https://coodesh.com/" target="_blank">Coodesh</a></div>
